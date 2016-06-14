@@ -1,0 +1,30 @@
+language: c++
+compiler:
+#  - clang
+  - gcc
+
+sudo: false
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - g++-5
+cache:
+  apt: true
+  directories:
+  - "$HOME/.travis/cmake/build/install"
+
+before_install:
+  - if [ "$CC"  == "gcc" ]; then export CC=gcc-5; fi
+  - if [ "$CXX" == "g++" ]; then export CXX=g++-5; fi
+  - pushd . && cd $HOME
+  - git clone https://github.com/LB--/travis.git travis
+  - source "./travis/update-cmake.sh"
+  - popd
+
+script:
+  - mkdir build && cd build
+  - cmake .. -DCMAKE_INSTALL_PREFIX="$(pwd)/install"
+  - cmake --build . --target install
+  - ctest -VV

@@ -21,7 +21,7 @@ With 8-bits, you can have up to `0b11111110` (7 code units) before the header ca
 To store larger values, the header needs to overflow into the next code unit, but we also want to keep the property that code units starting with `0b10` are a continuation, since this allows backtracking in a UTF-8 sequence.
 Thus, the first header size that spills over into multiple 8-bit code units looks like `0b11111111, 0b100xxxxx` and means there will be 9 code units.
 Note that it is not possible for there to be 8 code units - Either the header doesn't spill over and we have 7 code units, or the header does spill over and we have 9.
-This is intentional, for it retains the ability to visually inspect the binary and know how many code points there will be by simple counting the `1`s until the terminating `0` (ignoring the `0` in the second most significant bit).
+This is intentional, for it retains the ability to visually inspect the binary and know how many code points there will be by simply counting the `1`s until the terminating `0` (ignoring the `0` in the second most significant bit).
 
 Using this technique we retain full compatibility with UTF-8 while also supporting excessively large code points.
 Although the Unicode standard doesn't currently have enough code points to warrant such support, this library will be ready for the day it does (assuming the problem is still relevant by then and is solved the same way then as it is here).

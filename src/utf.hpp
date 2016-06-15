@@ -19,9 +19,11 @@ namespace LB
 
 			using code_unit_t = std::make_unsigned_t<std::remove_cv_t<std::remove_reference_t<decltype(*it)>>>;
 			static constexpr std::size_t NUM_BITS = sizeof(code_unit_t)*CHAR_BIT;
-			code_unit_t v = static_cast<code_unit_t>(*it);
 			static constexpr code_unit_t start = code_unit_t{1} << NUM_BITS-1;
+
+			code_unit_t v = static_cast<code_unit_t>(*it);
 			code_unit_t test = start;
+
 			if(!(v & test)) //code point made of exactly one code unit
 			{
 				return 1;
@@ -34,6 +36,7 @@ namespace LB
 					return 0;
 				}
 			}
+
 			std::size_t len = 1;
 			while(v & test)
 			{
@@ -44,6 +47,14 @@ namespace LB
 					if(++it == last || !((v = static_cast<code_unit_t>(*it)) & test)) //unexpected end of sequence
 					{
 						return 0;
+					}
+					else
+					{
+						test >>= 1;
+						if(v & test) //should have been a continuation but wasn't
+						{
+							return 0;
+						}
 					}
 					++len;
 				}

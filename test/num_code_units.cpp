@@ -10,9 +10,9 @@
 struct test final
 {
 	using input_t = std::vector<std::uintmax_t>;
-	input_t const input;
+	input_t input;
 	using output_t = std::size_t;
-	output_t const output;
+	output_t output;
 };
 
 int result = EXIT_SUCCESS;
@@ -53,10 +53,63 @@ auto cast(test::input_t const &input)
 	return r;
 }
 
+template<typename code_unit_t>
+void run_tests(std::vector<test> const &tests)
+{
+	std::cout << "No verification" << std::endl;
+	for(auto const &t : tests)
+	{
+		auto const input = cast<code_unit_t>(t.input);
+		validate<code_unit_t>(t, LB::utf::num_code_units(std::cbegin(input), std::cend(input)));
+	}
+	std::cout << "Verification of invalid sequences - too short" << std::endl;
+	for(auto t : tests)
+	{
+		if(t.input.size() != t.output)
+		{
+			t.output = 0;
+		}
+		auto const input = cast<code_unit_t>(t.input);
+		validate<code_unit_t>(t, LB::utf::num_code_units(std::cbegin(input), std::cend(input), true));
+	}
+	std::cout << "Verification of invalid sequences - unexpected 0b11 header" << std::endl;
+	for(auto t : tests)
+	{
+		if(t.input.size() < t.output)
+		{
+			t.input.resize(t.output, std::uintmax_t{0b11} << (sizeof(code_unit_t)*CHAR_BIT - 2));
+			t.output = 0;
+		}
+		auto const input = cast<code_unit_t>(t.input);
+		validate<code_unit_t>(t, LB::utf::num_code_units(std::cbegin(input), std::cend(input), true));
+	}
+	std::cout << "Verification of invalid sequences - unexpected 0b0 header" << std::endl;
+	for(auto t : tests)
+	{
+		if(t.input.size() < t.output)
+		{
+			t.input.resize(t.output);
+			t.output = 0;
+		}
+		auto const input = cast<code_unit_t>(t.input);
+		validate<code_unit_t>(t, LB::utf::num_code_units(std::cbegin(input), std::cend(input), true));
+	}
+	std::cout << "Verification of valid sequences" << std::endl;
+	for(auto t : tests)
+	{
+		if(t.input.size() < t.output)
+		{
+			t.input.resize(t.output, std::uintmax_t{0b1} << (sizeof(code_unit_t)*CHAR_BIT - 1));
+		}
+		auto const input = cast<code_unit_t>(t.input);
+		validate<code_unit_t>(t, LB::utf::num_code_units(std::cbegin(input), std::cend(input), true));
+	}
+}
+
 int main()
 {
-	{
-		std::vector<test> const tests
+	run_tests<std::int8_t>
+	(
 		{
 			{{}, 0},
 			{{0b00000000}, 1},
@@ -109,15 +162,10 @@ int main()
 			{{0b11111111, 0b10111111, 0b10111111, 0b10111111, 0b10110000}, 32},
 			{{0b11111111, 0b10111111, 0b10111111, 0b10111111, 0b10111000}, 33},
 			{{0b11111111, 0b10111111, 0b10111111, 0b10111111, 0b10111100}, 34},
-		};
-		for(auto const t : tests)
-		{
-			auto const input = cast<std::int8_t>(t.input);
-			validate<std::int8_t>(t, LB::utf::num_code_units(std::cbegin(input), std::cend(input)));
 		}
-	}
-	{
-		std::vector<test> const tests
+	);
+	run_tests<std::int16_t>
+	(
 		{
 			{{}, 0},
 			{{0b00000000'00000000}, 1},
@@ -159,15 +207,10 @@ int main()
 			{{0b11111111'11111111, 0b10111111'11111111, 0b11000000'00000000}, 0},
 			{{0b11111111'11111111, 0b10111111'11111111, 0b10100000'00000000}, 33},
 			{{0b11111111'11111111, 0b10111111'11111111, 0b10110000'00000000}, 34},
-		};
-		for(auto const t : tests)
-		{
-			auto const input = cast<std::int16_t>(t.input);
-			validate<std::int16_t>(t, LB::utf::num_code_units(std::cbegin(input), std::cend(input)));
 		}
-	}
-	{
-		std::vector<test> const tests
+	);
+	run_tests<std::int32_t>
+	(
 		{
 			{{}, 0},
 			{{0b00000000'00000000'00000000'00000000u}, 1},
@@ -207,13 +250,8 @@ int main()
 			{{0b11111111'11111111'11111111'11111111u, 0b10000000'00000000'00000000'00000000}, 33},
 			{{0b11111111'11111111'11111111'11111111u, 0b11000000'00000000'00000000'00000000}, 0},
 			{{0b11111111'11111111'11111111'11111111u, 0b10100000'00000000'00000000'00000000}, 34},
-		};
-		for(auto const t : tests)
-		{
-			auto const input = cast<std::int32_t>(t.input);
-			validate<std::int32_t>(t, LB::utf::num_code_units(std::cbegin(input), std::cend(input)));
 		}
-	}
+	);
 
 	return result;
 }

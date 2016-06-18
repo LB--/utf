@@ -10,7 +10,7 @@ namespace LB
 	namespace utf
 	{
 		template<typename code_unit_iterator>
-		std::size_t num_code_units(code_unit_iterator it, code_unit_iterator const last)
+		std::size_t num_code_units(code_unit_iterator it, code_unit_iterator const last, bool verify = false)
 		{
 			if(it == last)
 			{
@@ -19,7 +19,7 @@ namespace LB
 
 			using code_unit_t = std::make_unsigned_t<std::remove_cv_t<std::remove_reference_t<decltype(*it)>>>;
 			static constexpr std::size_t NUM_BITS = sizeof(code_unit_t)*CHAR_BIT;
-			static constexpr code_unit_t start = code_unit_t{1} << NUM_BITS-1;
+			static constexpr code_unit_t start = code_unit_t{0b1} << NUM_BITS-1;
 
 			code_unit_t v = static_cast<code_unit_t>(*it);
 			code_unit_t test = start;
@@ -37,10 +37,11 @@ namespace LB
 				}
 			}
 
-			std::size_t len = 1;
+			//read the header to determine the length
+			std::size_t len = 1
+			,           skip_bytes = 1;
 			while(v & test)
 			{
-				++len;
 				if(test == 1) //end of current code unit
 				{
 					test = start;
@@ -57,9 +58,33 @@ namespace LB
 						}
 					}
 					++len;
+					++skip_bytes;
 				}
+				++len;
 				test >>= 1;
 			}
+
+			if(verify)
+			{
+				//verify that the other continuation code units exist
+				for(std::size_t i = 0; i < len-skip_bytes; ++i)
+				{
+					test = start;
+					if(++it == last || !((v = static_cast<code_unit_t>(*it)) & test)) //unexpected end of sequence
+					{
+						return 0;
+					}
+					else
+					{
+						test >>= 1;
+						if(v & test) //should have been a continuation but wasn't
+						{
+							return 0;
+						}
+					}
+				}
+			}
+
 			return len;
 		}
 	}

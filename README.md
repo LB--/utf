@@ -1,7 +1,7 @@
 utf [![travis](https://travis-ci.org/LB--/utf.svg?branch=0)](https://travis-ci.org/LB--/utf)
 ===
 
-My personal C++14 UTF-8/16/32/64 library in the public domain.
+My personal C++14 UTF-8 library in the public domain.
 It supports arbitrary header length (and therefore supports code points that require more than four code units in UTF-8).
 Interaction is via iterators - as long as `operator*()` returns values with native endianness, everything works.
 
@@ -25,7 +25,13 @@ This is intentional, for it retains the ability to visually inspect the binary a
 
 Using this technique we retain full compatibility with UTF-8 while also supporting excessively large code points.
 Although the Unicode standard doesn't currently have enough code points to warrant such support, this library will be ready for the day it does (assuming the problem is still relevant by then and is solved the same way then as it is here).
-Just be aware that currently if you actually store any code points that require more than four or six 8-bit code units, the resulting encoded code points will likely not be recognized or supported by 99% of software that exists today. 
+Just be aware that currently if you actually store any code points that require more than four or six 8-bit code units, the resulting encoded code points will likely not be recognized or supported by 99% of software that exists today.
+
+**This library is NOT compatible with traditional UTF-16 encodings!**
+If you use a 16-bit code unit type, it is treated as if UTF-8 simply had more bits, which unfortunately is not how UTF-16 works.
+UTF-16 uses a more complicated encoding which does not share the same properties as UTF-8.
+[The only time you should use traditional UTF-16 is when interacting with the Windows API.](http://utf8everywhere.org/#windows)
+If you have UTF-16 strings that you want to use with this library, first [convert them to UTF-8](https://gist.github.com/LB--/735a911302ee9891a431514f6978e0a6) and then pass them to this library. 
 
 ## Usage
 ### CMake

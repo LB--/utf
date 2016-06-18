@@ -35,6 +35,17 @@ You may need to set the CMake variable `LB/utf_ROOT` if you installed to a nonst
 Finally, link to the `LB::utf` imported target with `target_link_libraries()`.
 
 ### C++
-`#include <LB/utf/utf.hpp>`
+`#include <LB/utf/utf.hpp>`  
+All names are in the `LB::utf::` namespace.
 
-TODO
+#### `num_code_units`
+Reads the header of a UTF sequence and returns the number of code units that make up the sequence, or 0 if the sequence is invalid.
+```cpp
+template<typename code_unit_iterator>
+auto num_code_units(code_unit_iterator it, code_unit_iterator const last, bool verify = false)
+noexcept(noexcept(it == last) && noexcept(*it) && noexcept(++it))
+-> std::size_t
+```
+`code_unit_iterator` must be at least an input iterator, and `*it` must return an integral type whose value has native endianness.
+`it` should refer to the first code unit that makes up the sequence, and `last` should be the one-past-the-end iterator for the sequence or container (e.g. `std::cend(utf_string)`).
+If `verify` is true, the function examines additional code units after the ones that contain the header to ensure the sequence is valid.

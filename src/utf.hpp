@@ -10,7 +10,9 @@ namespace LB
 	namespace utf
 	{
 		template<typename code_unit_iterator>
-		std::size_t num_code_units(code_unit_iterator it, code_unit_iterator const last, bool verify = false)
+		auto num_code_units(code_unit_iterator it, code_unit_iterator const last, bool verify = false)
+		noexcept(noexcept(it == last) && noexcept(*it) && noexcept(++it))
+		-> std::size_t
 		{
 			if(it == last)
 			{

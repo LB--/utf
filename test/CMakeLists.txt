@@ -14,3 +14,4 @@ macro(simple_test _name)
 endmacro()
 
 simple_test(num_code_units)
+simple_test(read_code_point)

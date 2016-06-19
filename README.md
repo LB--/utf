@@ -55,3 +55,17 @@ noexcept(noexcept(it == last) && noexcept(*it) && noexcept(++it))
 `code_unit_iterator` must be at least an input iterator, and `*it` must return an integral type whose value has native endianness.
 `it` should refer to the first code unit that makes up the sequence, and `last` should be the one-past-the-end iterator for the sequence or container (e.g. `std::cend(utf_string)`).
 If `verify` is true, the function examines additional code units after the ones that contain the header to ensure the sequence is valid.
+
+#### `read_code_point`
+Decodes a UTF sequence to yield the original code point, and returns an iterator to the start of the next sequence if successful.
+```cpp
+template<typename code_unit_iterator, typename code_point_t>
+auto read_code_point(code_unit_iterator it, code_unit_iterator const last, code_point_t &cp)
+noexcept(noexcept(num_code_units(it, last)) && noexcept(it == last) && noexcept(*it) && noexcept(++it) && std::is_nothrow_copy_constructible<code_unit_iterator>::value && std::is_nothrow_default_constructible<code_point_t>::value && std::is_nothrow_copy_assignable<code_point_t>::value && noexcept(cp <<= 1) && noexcept(cp |= 1))
+-> code_unit_iterator
+```
+`code_unit_iterator` must be at least an input iterator with multi-pass support, and `*it` must return an integral type whose value has native endianness.
+`it` should refer to the first code unit that makes up the sequence, and `last` should be the one-past-the-end iterator for the sequence or container (e.g. `std::cend(utf_string)`).
+`cp` is an output parameter for the code point to be stored in, and for obvious reasons must be large enough to contain any Unicode code point, though does not necessarily have to be a primitive type.
+The operations `cp` must support are default construction, `operator=(code_point_t const &)`, `operator<<=(std::size_t)`, and `operator|=(code_point_t const &)`.
+If the sequence is invalid, the function returns the original value of `it` and the value of `cp` is undefined.

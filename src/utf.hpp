@@ -3,6 +3,7 @@
 
 #include <climits>
 #include <cstdint>
+#include <limits>
 #include <type_traits>
 
 namespace LB
@@ -88,6 +89,65 @@ namespace LB
 			}
 
 			return len;
+		}
+
+		template<typename code_unit_iterator, typename code_point_t>
+		auto read_code_point(code_unit_iterator it, code_unit_iterator const last, code_point_t &cp)
+		noexcept(noexcept(num_code_units(it, last)) && noexcept(it == last) && noexcept(*it) && noexcept(++it) && std::is_nothrow_copy_constructible<code_unit_iterator>::value && std::is_nothrow_default_constructible<code_point_t>::value && std::is_nothrow_copy_assignable<code_point_t>::value && noexcept(cp <<= 1) && noexcept(cp |= 1))
+		-> code_unit_iterator
+		{
+			if(std::size_t n = num_code_units(it, last))
+			{
+				if(n == 1)
+				{
+					cp = *it;
+					return ++it;
+				}
+				cp = {};
+
+				using code_unit_t = std::make_unsigned_t<std::remove_cv_t<std::remove_reference_t<decltype(*it)>>>;
+				static constexpr std::size_t NUM_BITS = sizeof(code_unit_t)*CHAR_BIT;
+				code_unit_iterator const first = it;
+
+				std::size_t skip_bits = n+1;
+				while(skip_bits >= NUM_BITS)
+				{
+					skip_bits -= NUM_BITS-1;
+					--n;
+					if(++it == last) //unexpected end of sequence
+					{
+						return first;
+					}
+				}
+
+				code_unit_t v = static_cast<code_unit_t>(*it);
+				code_unit_t mask = (std::numeric_limits<code_unit_t>::max() >> skip_bits); //skip initial header
+				for(;;)
+				{
+					cp <<= NUM_BITS-2;
+					cp |= (*it & mask);
+					mask = (std::numeric_limits<code_unit_t>::max() >> 2); //skip continuation header
+
+					--n, ++it;
+					if(!n)
+					{
+						break;
+					}
+
+					if(it == last || !((v = static_cast<code_unit_t>(*it)) & (code_unit_t{0b1} << NUM_BITS-1))) //unexpected end of sequence
+					{
+						return first;
+					}
+					else
+					{
+						if(v & (code_unit_t{0b1} << NUM_BITS-2)) //should have been a continuation but wasn't
+						{
+							return first;
+						}
+					}
+				}
+			}
+			return it;
 		}
 	}
 }

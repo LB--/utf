@@ -9,15 +9,15 @@ addons:
     sources:
     - ubuntu-toolchain-r-test
     packages:
-    - g++-5
+    - g++-6
 cache:
   apt: true
   directories:
   - "$HOME/.travis/cmake/build/install"
 
 before_install:
-  - if [ "$CC"  == "gcc" ]; then export CC=gcc-5; fi
-  - if [ "$CXX" == "g++" ]; then export CXX=g++-5; fi
+  - if [ "$CC"  == "gcc" ]; then export CC=gcc-6; fi
+  - if [ "$CXX" == "g++" ]; then export CXX=g++-6; fi
   - pushd . && cd $HOME
   - git clone https://github.com/LB--/travis.git travis
   - source "./travis/update-cmake.sh"

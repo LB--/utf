@@ -149,6 +149,47 @@ namespace LB
 			}
 			return it;
 		}
+
+		template<typename code_unit_t, typename code_point_t>
+		constexpr auto min_code_units(code_point_t cp)
+		noexcept(noexcept(cp < 1) && noexcept(!(cp == 1)) && noexcept(cp >>= 1))
+		-> std::size_t
+		{
+			using code_unit_ty = std::make_unsigned_t<code_unit_t>;
+			constexpr std::size_t NUM_BITS = sizeof(code_unit_ty)*CHAR_BIT;
+
+			//no-op if we can fit the code point in a single code unit
+			if(cp < static_cast<code_unit_ty>(code_unit_ty{1} << NUM_BITS-1))
+			{
+				return 1;
+			}
+
+			//count the number of bits we have to store
+			std::size_t bits = 0;
+			while(!(cp == 0))
+			{
+				cp >>= 1;
+				++bits;
+			}
+
+			//calculate how many code units are needed to store these bits plus the header bits
+			std::size_t units = 2;
+			while(bits + (units+1 - (units + (units-1)/NUM_BITS)/NUM_BITS) + (units-1)*2 > units*NUM_BITS)
+			{
+				++units;
+			}
+
+			//add extra to avoid situations which are impossible to represent
+			//e.g. with 8 bit code units, we cannot represent 8, 15, 22, 29, etc.
+			if((units + (units-1)/NUM_BITS)%NUM_BITS == 0)
+			{
+				++units;
+			}
+
+			//TODO: explain the expression (units + (units-1)/NUM_BITS)
+
+			return units;
+		}
 	}
 }
 

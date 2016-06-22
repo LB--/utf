@@ -66,6 +66,18 @@ noexcept(noexcept(num_code_units(it, last)) && noexcept(it == last) && noexcept(
 ```
 `code_unit_iterator` must be at least an input iterator with multi-pass support, and `*it` must return an integral type whose value has native endianness.
 `it` should refer to the first code unit that makes up the sequence, and `last` should be the one-past-the-end iterator for the sequence or container (e.g. `std::cend(utf_string)`).
-`cp` is an output parameter for the code point to be stored in, and for obvious reasons must be large enough to contain any Unicode code point, though does not necessarily have to be a primitive type.
+`cp` is an output parameter for the code point to be stored in, and for obvious reasons must be large enough to contain any Unicode code point, and must be unsigned, though does not necessarily have to be a primitive type.
 The operations `cp` must support are default construction, `operator=(code_point_t const &)`, `operator<<=(std::size_t)`, and `operator|=(code_point_t const &)`.
 If the sequence is invalid, the function returns the original value of `it` and the value of `cp` is undefined.
+
+#### `min_code_units`
+Calculates the minimum number of code units required to store a code point.
+```cpp
+template<typename code_unit_t, typename code_point_t>
+constexpr auto min_code_units(code_point_t cp)
+noexcept(noexcept(cp < 1) && noexcept(!(cp == 1)) && noexcept(cp >>= 1))
+-> std::size_t
+```
+`code_unit_t` must be an integral type.
+`code_point_t` must be an unsigned integral type, or unsigned-integer-like in that it must support `operator<(code_unit_t)`, `operator==(int)`, and `operator>>=(std::size_t)`.
+The return value is guaranteed to be non-zero.

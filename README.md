@@ -81,3 +81,13 @@ noexcept(noexcept(cp < 1) && noexcept(!(cp == 1)) && noexcept(cp >>= 1))
 `code_unit_t` must be an integral type.
 `code_point_t` must be an unsigned integral type, or unsigned-integer-like in that it must support `operator<(code_unit_t)`, `operator==(int)`, and `operator>>=(std::size_t)`.
 The return value is guaranteed to be non-zero.
+
+#### `encode_code_point`
+Encodes a code point as a UTF sequence and returns it in the form of a string.
+```cpp
+template<typename code_unit_t, typename code_point_t>
+auto encode_code_point(code_point_t cp)
+-> std::basic_string<code_unit_t>
+```
+`code_unit_t` must be an integral type.
+`code_point_t` must be an unsigned integral type, or unsigned-integer-like in that it must support `operator<(code_unit_t)`, `operator==(int)`, `operator>>=(std::size_t)`, `operator&(int)`, and must be convertible to `code_unit_t`.

@@ -4,6 +4,7 @@
 #include <climits>
 #include <cstdint>
 #include <limits>
+#include <string>
 #include <type_traits>
 
 namespace LB
@@ -189,6 +190,66 @@ namespace LB
 			//TODO: explain the expression (units + (units-1)/NUM_BITS)
 
 			return units;
+		}
+
+		template<typename code_unit_t, typename code_point_t>
+		auto encode_code_point(code_point_t cp)
+		-> std::basic_string<code_unit_t>
+		{
+			using code_unit_ty = std::make_unsigned_t<std::remove_cv_t<std::remove_reference_t<code_unit_t>>>;
+			static constexpr std::size_t NUM_BITS = sizeof(code_unit_ty)*CHAR_BIT;
+
+			std::size_t const units = min_code_units<code_unit_t>(cp);
+			if(units == 1)
+			{
+				return {static_cast<code_unit_t>(cp)};
+			}
+
+			std::basic_string<code_unit_t> code_units (units, code_unit_t{});
+
+			//set continuation headers
+			for(std::size_t i = 1; i < code_units.size(); ++i)
+			{
+				code_units[i] = static_cast<code_unit_t>(code_unit_ty{0b1} << NUM_BITS-1);
+			}
+
+			//fill header bits
+			if(code_units.size() < NUM_BITS)
+			{
+				code_units[0] = static_cast<code_unit_t>(std::numeric_limits<code_unit_ty>::max() << (NUM_BITS - code_units.size()));
+			}
+			else
+			{
+				code_units[0] = static_cast<code_unit_t>(std::numeric_limits<code_unit_ty>::max());
+				std::size_t bits = code_units.size()-NUM_BITS;
+				bits -= (bits-1)/(NUM_BITS-2) + 1; //include continuation header bits
+				for(std::size_t i = 0; i < bits; ++i)
+				{
+					code_unit_ty &cu = reinterpret_cast<code_unit_ty &>(code_units[1 + i/(NUM_BITS-2)]);
+					cu |= (code_unit_ty{0b1} << ((NUM_BITS-3) - i%(NUM_BITS-2)));
+				}
+			}
+
+			//store code point
+			auto it = std::rbegin(code_units);
+			std::size_t shift = 0;
+			while(!(cp == 0))
+			{
+				code_unit_ty &cu = reinterpret_cast<code_unit_ty &>(*it);
+				if(cp & 0b1)
+				{
+					cu |= (code_unit_ty{0b1} << shift);
+				}
+				cp >>= 1;
+
+				if(++shift >= NUM_BITS-2)
+				{
+					++it;
+					shift = 0;
+				}
+			}
+
+			return code_units;
 		}
 	}
 }

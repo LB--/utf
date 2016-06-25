@@ -3,6 +3,7 @@
 
 #include <climits>
 #include <cstdint>
+#include <iterator>
 #include <limits>
 #include <string>
 #include <type_traits>
@@ -13,7 +14,7 @@ namespace LB
 	namespace utf
 	{
 		template<typename code_unit_iterator>
-		using unsigned_code_unit_t = std::make_unsigned_t<std::remove_cv_t<std::remove_reference_t<decltype(*std::declval<code_unit_iterator>())>>>;
+		using unsigned_code_unit_t = std::make_unsigned_t<typename std::iterator_traits<code_unit_iterator>::value_type>;
 
 		template<typename code_unit_iterator>
 		auto num_code_units(code_unit_iterator it, code_unit_iterator const last, bool verify = false)

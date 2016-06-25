@@ -66,7 +66,9 @@ If your compiler has primitive integer types that large or you want to break con
 It _should_ work as long as `sizeof(your_type)` is correct.
 I think.
 
-### UTF-not-a-power-of-2
+### UTF-not-a-power-of-2 (e.g. UTF-24)
+If you have a system with one or more primitive integer types that are not powers of two but are still multiples of `CHAR_BIT`, this library will still work.
+(For example, I have actually worked on a system with a 24-bit `short long` primitive integer type).
 If you have a weird system where `CHAR_BIT` is not `8`, this library should still work.
 You only need at least 3 bits per code unit to use UTF-style encoding, though at that point the headers would take up over half of the code points.
 If you have a weirder system where some primitive integer types are not multiples of `CHAR_BIT`, then sorry, you won't be able to use this library, or a C++ compiler for that matter.

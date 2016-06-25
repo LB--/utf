@@ -124,7 +124,7 @@ namespace LB
 					--remaining;
 					if(++it == last) //unexpected end of sequence
 					{
-						return {first, 0u};
+						return {first, 0};
 					}
 				}
 
@@ -144,13 +144,13 @@ namespace LB
 
 					if(it == last || !((v = static_cast<code_unit_t>(*it)) & (code_unit_t{0b1} << NUM_BITS-1))) //unexpected end of sequence
 					{
-						return {first, 0u};
+						return {first, 0};
 					}
 					else
 					{
 						if(v & (code_unit_t{0b1} << NUM_BITS-2)) //should have been a continuation but wasn't
 						{
-							return {first, 0u};
+							return {first, 0};
 						}
 					}
 				}
@@ -167,7 +167,7 @@ namespace LB
 			constexpr std::size_t NUM_BITS = sizeof(code_unit_ty)*CHAR_BIT;
 
 			//no-op if we can fit the code point in a single code unit
-			if(cp < static_cast<code_unit_ty>(code_unit_ty{1} << NUM_BITS-1))
+			if(cp < static_cast<code_unit_ty>(code_unit_ty{0b1} << NUM_BITS-1))
 			{
 				return 1;
 			}
@@ -176,7 +176,7 @@ namespace LB
 			std::size_t bits = 0;
 			while(!(cp == 0u))
 			{
-				cp >>= std::size_t{1u};
+				cp >>= std::size_t{1};
 				++bits;
 			}
 
@@ -217,7 +217,7 @@ namespace LB
 			//set continuation headers
 			for(std::size_t i = 1; i < code_units.size(); ++i)
 			{
-				code_units[i] = static_cast<code_unit_t>(code_unit_ty{0b1u} << NUM_BITS-1);
+				code_units[i] = static_cast<code_unit_t>(code_unit_ty{0b1} << NUM_BITS-1);
 			}
 
 			//fill header bits
@@ -233,7 +233,7 @@ namespace LB
 				for(std::size_t i = 0; i < bits; ++i)
 				{
 					code_unit_ty &cu = reinterpret_cast<code_unit_ty &>(code_units[1 + i/(NUM_BITS-2)]);
-					cu |= (code_unit_ty{0b1u} << ((NUM_BITS-3) - i%(NUM_BITS-2)));
+					cu |= (code_unit_ty{0b1} << ((NUM_BITS-3) - i%(NUM_BITS-2)));
 				}
 			}
 
@@ -243,11 +243,11 @@ namespace LB
 			while(!(cp == 0u))
 			{
 				code_unit_ty &cu = reinterpret_cast<code_unit_ty &>(*it);
-				if(cp & 0b1u)
+				if(cp & 0b1)
 				{
-					cu |= static_cast<code_unit_ty>(code_unit_ty{0b1u} << shift);
+					cu |= static_cast<code_unit_ty>(code_unit_ty{0b1} << shift);
 				}
-				cp >>= std::size_t{1u};
+				cp >>= std::size_t{1};
 
 				if(++shift >= NUM_BITS-2)
 				{

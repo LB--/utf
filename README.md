@@ -103,7 +103,7 @@ Decodes a UTF sequence to yield the original code point, and returns both an ite
 ```cpp
 template<typename code_unit_iterator, typename code_point_t>
 auto read_code_point(code_unit_iterator it, code_unit_iterator const last, code_point_t &cp)
-noexcept(noexcept(num_code_units(it, last)) && noexcept(it == last) && noexcept(*it) && noexcept(++it) && noexcept(cp = *it) && noexcept(cp = {}) && noexcept(cp <<= std::size_t{}) && noexcept(cp |= unsigned_code_unit_t<code_unit_iterator>{}))
+noexcept(noexcept(num_code_units(it, last)) && noexcept(it == last) && noexcept(*it) && noexcept(++it) && std::is_nothrow_copy_constructible<code_unit_iterator>::value && noexcept(cp = *it) && noexcept(cp = {}) && noexcept(cp <<= std::size_t{}) && noexcept(cp |= unsigned_code_unit_t<code_unit_iterator>{}))
 -> std::pair<code_unit_iterator, std::size_t>
 ```
 `code_unit_iterator` must be at least an input iterator with multi-pass support, and `*it` must return an integral type whose value has native endianness.

@@ -9,11 +9,11 @@ project(LB/utf
 )
 set(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}/${PROJECT_VERSION}")
 
-add_library(utf
-	"src/utf.cpp"
-)
+add_library(utf INTERFACE)
+set_property(TARGET utf PROPERTY INTERFACE_CXX_STANDARD ${CMAKE_CXX_STANDARD})
+set_property(TARGET utf PROPERTY INTERFACE_CXX_EXTENSIONS ${CMAKE_CXX_EXTENSIONS})
 target_include_directories(utf
-	PUBLIC
+	INTERFACE
 		$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
 		$<INSTALL_INTERFACE:include>
 )
@@ -22,7 +22,6 @@ install(
 	TARGETS
 		utf
 	EXPORT utf
-	ARCHIVE DESTINATION lib/${PROJECT_NAME}
 )
 install(
 	EXPORT utf

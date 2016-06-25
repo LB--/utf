@@ -12,7 +12,7 @@ void run_tests()
 {
 	static constexpr std::size_t NUM_BITS = sizeof(code_unit_t)*CHAR_BIT;
 	static constexpr std::size_t MAX_NUM_BITS = sizeof(std::uintmax_t)*CHAR_BIT;
-	for(std::uintmax_t cp = 0; !(cp & (std::uintmax_t{0b11} << MAX_NUM_BITS-2)); (cp <<= 2) |= 0b1)
+	for(std::uintmax_t cp = 0; ; (cp <<= 1) |= 0b1)
 	{
 		auto const str = LB::utf::encode_code_point<code_unit_t>(cp);
 		std::uintmax_t cp2 = 0;
@@ -41,6 +41,11 @@ void run_tests()
 				std::cout << "0b" << std::bitset<NUM_BITS>{static_cast<std::uintmax_t>(cu)};
 			}
 			std::cout << "} (" << cp2 << ")" << std::endl;
+		}
+
+		if(cp & (std::uintmax_t{0b1} << MAX_NUM_BITS-1))
+		{
+			break;
 		}
 	}
 }

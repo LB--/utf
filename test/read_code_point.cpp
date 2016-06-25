@@ -74,7 +74,7 @@ void run_tests(std::vector<test> const &tests)
 	{
 		auto const input = cast<code_unit_t>(t.input);
 		std::uintmax_t cp {};
-		auto it = LB::utf::read_code_point(std::cbegin(input), std::cend(input), cp);
+		auto it = LB::utf::read_code_point(std::cbegin(input), std::cend(input), cp).first;
 		validate<code_unit_t>(t, {it-std::cbegin(input), cp});
 	}
 }

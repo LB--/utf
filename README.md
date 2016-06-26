@@ -74,17 +74,35 @@ You only need at least 3 bits per code unit to use UTF-style encoding, though at
 If you have a weirder system where some primitive integer types are not multiples of `CHAR_BIT`, then sorry, you won't be able to use this library, or a C++ compiler for that matter.
 
 ## Usage
+Known good compilers are GCC 6 and Visual Studio 2015 Update 2.
+For Visual Studio, you may need to remove the `constexpr` declarations from some functions if you get errors related to that.
+
 ### CMake
-From the `cmake` directory, copy the `FindLB` directory to a place in your `CMAKE_MODULE_PATH`.
+Building, installation, and linking to your own project are done with [CMake](https://cmake.org/).
+You need at least CMake 3.4.
+
+This is a header-only library, so if you don't want to build, install, and link with CMake, you don't need to - just copy `utf.hpp` wherever you want.
+
+#### Configuring and Building
+Create an empty directory to use with CMake, and run CMake there with the path to this repository.
+You can simply create a `build` subfolder within this repository and run `cmake ..` or the CMake GUI.
+Specify the installation path of your choice with [`-DCMAKE_INSTALL_PREFIX=path`](https://cmake.org/cmake/help/latest/variable/CMAKE_INSTALL_PREFIX.html) if the default on your system is not to your liking.
+The tests are enabled by default, but if you aren't interested in those, set `-DBUILD_TESTS=OFF`.
+Also, be sure to set [`CMAKE_BUILD_TYPE`](https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE) appropriately.
+
+Then, simply build with the generator of your choice, or ask CMake to do it for you with `cmake --build .`.
+Since this is a header-only library, the build step is only really for building the tests.
+
+#### Installation and Linking
+First, use CMake's install step to install the project (e.g. `cmake --build . --target install`).
+From the `cmake` directory, copy the `FindLB` directory to a place in your [`CMAKE_MODULE_PATH`](https://cmake.org/cmake/help/latest/variable/CMAKE_MODULE_PATH.html).
 Then, add `find_package(LB/utf REQUIRED)` to your CMake script.
 You may need to set the CMake variable `LB/utf_ROOT` if you installed to a nonstandard location.
-Finally, link to the `LB::utf` imported target with `target_link_libraries()`.
+Finally, link to the `LB::utf` imported target with [`target_link_libraries()`](https://cmake.org/cmake/help/latest/command/target_link_libraries.html).
 
 ### C++
 `#include <LB/utf/utf.hpp>`  
 All names are in the `LB::utf::` namespace.
-
-This is a header-only library, so if you don't want to build, install, and link with CMake, you don't need to - just copy `utf.hpp` wherever you want.
 
 #### `num_code_units`
 Reads the header of a UTF sequence and returns the number of code units that make up the sequence, or 0 if the sequence is invalid.

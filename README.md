@@ -97,7 +97,7 @@ Since this is a header-only library, the build step is only really for building 
 #### Installation and Linking
 First, use CMake's install step to install the project (e.g. `cmake --build . --target install`).
 From the `cmake` directory, copy the `FindLB` directory to a place in your [`CMAKE_MODULE_PATH`](https://cmake.org/cmake/help/latest/variable/CMAKE_MODULE_PATH.html).
-Then, add `find_package(LB/utf REQUIRED)` to your CMake script.
+Then, add `find_package(LB/utf 1 EXACT REQUIRED)` to your CMake script.
 You may need to set the CMake variable `LB/utf_ROOT` if you installed to a nonstandard location.
 Finally, link to the `LB::utf` imported target with [`target_link_libraries()`](https://cmake.org/cmake/help/latest/command/target_link_libraries.html).
 
@@ -131,6 +131,8 @@ noexcept(noexcept(num_code_units(it, last)) && noexcept(it == last) && noexcept(
 The operations `cp` must support are those shown in the `noexcept` specification.
 If the sequence is invalid, the function returns the original value of `it` and `0`, and the value of `cp` is undefined.
 
+See `example/num_code_points.cpp` for example usage.
+
 #### `min_code_units`
 Calculates the minimum number of code units required to store a code point.
 ```cpp
@@ -153,3 +155,5 @@ auto encode_code_point(code_point_t cp)
 `code_unit_t` must be an integral type.
 `code_point_t` must be an unsigned integral type, or and unsigned-integer-like type that must support , `operator==(unsigned)`, `operator>>=(std::size_t)`, `operator&(unsigned)`, must be convertible to `code_unit_t`, and must be able to be passed to `min_code_units`.
 This function does not have any `noexcept` specification because `std::basic_string` does not - the memory allocation could throw an exception.
+
+See `example/encode_all.cpp` for example usage.

@@ -87,8 +87,9 @@ This is a header-only library, so if you don't want to build, install, and link 
 Create an empty directory to use with CMake, and run CMake there with the path to this repository.
 You can simply create a `build` subfolder within this repository and run `cmake ..` or the CMake GUI.
 Specify the installation path of your choice with [`-DCMAKE_INSTALL_PREFIX=path`](https://cmake.org/cmake/help/latest/variable/CMAKE_INSTALL_PREFIX.html) if the default on your system is not to your liking.
-The tests are enabled by default, but if you aren't interested in those, set `-DBUILD_TESTS=OFF`.
 Also, be sure to set [`CMAKE_BUILD_TYPE`](https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE) appropriately.
+
+The tests and examples are built by default, but if you aren't interested in those, set `-DBUILD_TESTS=OFF` and/or `-DBUILD_EXAMPLES=OFF`.
 
 Then, simply build with the generator of your choice, or ask CMake to do it for you with `cmake --build .`.
 Since this is a header-only library, the build step is only really for building the tests.

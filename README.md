@@ -55,13 +55,13 @@ This library makes no attempt to detect or otherwise acknowledge endianness, and
 ### UTF-64
 Sure!
 After 63 bits, you'll start to use more than one code unit per code point.
-To really take advantage of this, though, you will want to use a custom unsigned numeric type, most likely from the C++ bignum library of your choice.
+To really take advantage of this, though, you will want to use a custom unsigned numeric type as the code point type, most likely from the C++ bignum library of your choice.
 Just make sure the type you use overloads the proper C++ operators.
 
 ### UTF-128, UTF-256, UTF-512, UTF-1024, etc
 Sure, I guess?
 Does your compiler even have any primitive integer types that large?
-Code point types have to be primitive integer types so that they can be passed to [`std::make_unsigned`](http://en.cppreference.com/w/cpp/types/make_unsigned), though I guess you could defenestrate conformance and specialize `std::make_unsigned` on your own types.
+Code unit types have to be primitive integer types so that they can be passed to [`std::make_unsigned`](http://en.cppreference.com/w/cpp/types/make_unsigned), though I guess you could defenestrate conformance and specialize `std::make_unsigned` on your own types.
 If your compiler has primitive integer types that large or you want to break conformance, go for it.
 It _should_ work as long as `sizeof(your_type)` is correct.
 I think.
@@ -70,7 +70,7 @@ I think.
 If you have a system with one or more primitive integer types that are not powers of two but are still multiples of `CHAR_BIT`, this library will still work.
 (For example, I have actually worked on a system with a 24-bit `short long` primitive integer type).
 If you have a weird system where `CHAR_BIT` is not `8`, this library should still work.
-You only need at least 3 bits per code unit to use UTF-style encoding, though at that point the headers would take up over half of the code points.
+You only need at least 3 bits per code unit to use UTF-style encoding, though at that point the headers would take up over half of the code units.
 If you have a weirder system where some primitive integer types are not multiples of `CHAR_BIT`, then sorry, you won't be able to use this library, or a C++ compiler for that matter.
 
 ## Usage

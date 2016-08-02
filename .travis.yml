@@ -23,8 +23,16 @@ before_install:
   - source "./travis/update-cmake.sh"
   - popd
 
+install:
+  - if [ "$CXX" == "g++-6" ]; then pip install --user cpp-coveralls; fi
+
 script:
+  - pushd .
   - mkdir build && cd build
-  - cmake .. -DCMAKE_INSTALL_PREFIX="$(pwd)/install"
+  - cmake .. "-DCMAKE_INSTALL_PREFIX=$(pwd)/install" "-DCMAKE_CXX_FLAGS=--coverage -fno-inline -fno-inline-small-functions -fno-default-inline"
   - cmake --build . --target install
   - ctest -VV
+  - popd
+
+after_success:
+  - if [ "$CXX" == "g++-6" ]; then coveralls --include "$(pwd)/src/" --gcov /usr/bin/gcov-6 --gcov-options '\-lp'; fi

@@ -1,4 +1,4 @@
-utf [![travis](https://travis-ci.org/LB--/utf.svg?branch=1.y.z)](https://travis-ci.org/LB--/utf)
+utf [![travis](https://travis-ci.org/LB--/utf.svg?branch=1.y.z)](https://travis-ci.org/LB--/utf) [![coveralls](https://coveralls.io/repos/github/LB--/utf/badge.svg?branch=1.y.z)](https://coveralls.io/github/LB--/utf)
 ===
 
 My personal C++14 UTF-8 library in the public domain.

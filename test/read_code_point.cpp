@@ -100,6 +100,19 @@ void run_tests(std::vector<test> const &tests)
 		auto it = LB::utf::read_code_point(std::cbegin(input), std::cend(input), cp).first;
 		validate<code_unit_t>(t, {it-std::cbegin(input), cp});
 	}
+	std::cout << "Invalid sequences - WAY too short" << std::endl;
+	for(auto t : tests)
+	{
+		auto input = cast<code_unit_t>(t.input);
+		if(input.size() > 1)
+		{
+			input.resize(1);
+			t.output = {0, 0};
+		}
+		std::uintmax_t cp {};
+		auto it = LB::utf::read_code_point(std::cbegin(input), std::cend(input), cp).first;
+		validate<code_unit_t>(t, {it-std::cbegin(input), cp});
+	}
 	std::cout << "Invalid sequences - unexpected 0b11 header" << std::endl;
 	for(auto t : tests)
 	{

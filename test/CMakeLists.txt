@@ -52,4 +52,9 @@ if(BUILD_EXAMPLES)
 		COMMAND example-num_code_points a b
 	)
 	set_property(TEST num_code_points-fail2 PROPERTY WILL_FAIL ON)
+	add_test(
+		NAME num_code_points-fail-missing
+		COMMAND example-num_code_points "no.such.file"
+	)
+	set_property(TEST num_code_points-fail-missing PROPERTY WILL_FAIL ON)
 endif()

@@ -35,4 +35,4 @@ script:
   - popd
 
 after_success:
-  - if [ "$CXX" == "g++-6" ]; then coveralls --include "$(pwd)/src/" --gcov /usr/bin/gcov-6 --gcov-options '\-lp'; fi
+  - if [ "$CXX" == "g++-6" ]; then coveralls --include "$(pwd)/src/" --include "$(pwd)/example/" --gcov /usr/bin/gcov-6 --gcov-options '\-lp'; fi

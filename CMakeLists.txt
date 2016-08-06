@@ -34,13 +34,13 @@ install(
 	DESTINATION include/${PROJECT_NAME}
 )
 
+option(BUILD_EXAMPLES "Whether to build the examples" ON)
+if(BUILD_EXAMPLES)
+	add_subdirectory(example)
+endif()
+
 option(BUILD_TESTS "Whether to build the tests" ON)
 if(BUILD_TESTS)
 	enable_testing()
 	add_subdirectory(test)
-endif()
-
-option(BUILD_EXAMPLES "Whether to build the examples" ON)
-if(BUILD_EXAMPLES)
-	add_subdirectory(example)
 endif()

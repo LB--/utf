@@ -24,7 +24,7 @@ void validate(test const &t, test::output_t output)
 {
 	static constexpr std::size_t NUM_BITS = sizeof(code_unit_t)*CHAR_BIT;
 	static constexpr std::size_t MAX_NUM_BITS = sizeof(std::uintmax_t)*CHAR_BIT;
-	if(output != t.output && std::get<0>(t.output) != 0)
+	if(output != t.output && (std::get<0>(t.output) != 0 || std::get<0>(output) != 0))
 	{
 		result = EXIT_FAILURE;
 		std::cout << "Fail: {";
@@ -82,7 +82,10 @@ void run_tests(std::vector<test> const &tests)
 	for(auto const &t : tests)
 	{
 		auto input = cast<code_unit_t>(t.input);
-		input.push_back(0);
+		if(input.size() > 0)
+		{
+			input.push_back(0);
+		}
 		std::uintmax_t cp {};
 		auto it = LB::utf::read_code_point(std::cbegin(input), std::cend(input), cp).first;
 		validate<code_unit_t>(t, {it-std::cbegin(input), cp});
@@ -130,7 +133,7 @@ void run_tests(std::vector<test> const &tests)
 	for(auto t : tests)
 	{
 		auto input = cast<code_unit_t>(t.input);
-		if(input.size() > 0)
+		if(input.size() > 1)
 		{
 			input.back() = 0;
 			t.output = {0, 0};
